@@ -1,9 +1,16 @@
-from src.data_loader import load_data
-from src.preprocessing import split_data
-from src.model import train_model
-from src.evaluation import evaluate_model
-data = load_data()
-X_train, X_test, y_train, y_test = split_data(data)
-model = train_model(X_train, y_train)
-report = evaluate_model(model, X_test, y_test)
-print(report)
+from src.sequential import run_sequential
+from src.threadingex import run_threading
+from src.processes import run_processes
+
+def main():
+    print("Running sequential case...")
+    run_sequential()
+
+    print("\nRunning threading case...")
+    run_threading()
+
+    print("\nRunning processes case...")
+    run_processes()
+
+if __name__ == "__main__":
+    main()
