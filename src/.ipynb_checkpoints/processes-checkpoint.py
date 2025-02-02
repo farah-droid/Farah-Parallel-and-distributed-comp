@@ -3,11 +3,11 @@ import time
 import random
 
 def generate_chars():
-    chars = [random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(500)]  # Split work in half
+    chars = [random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(500000)]  # Split work in half
     return ''.join(chars)
 
 def generate_numbers():
-    numbers = [random.randint(1, 100) for _ in range(500)]
+    numbers = [random.randint(1, 100) for _ in range(500000)]
     return sum(numbers)
 
 def run_processes():

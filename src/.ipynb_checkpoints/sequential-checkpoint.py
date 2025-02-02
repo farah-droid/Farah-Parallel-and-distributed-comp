@@ -2,11 +2,11 @@ import random
 import time
 
 def generate_chars():
-    chars = [random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(1000)]
+    chars = [random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(1000000)]
     return ''.join(chars)
 
 def generate_numbers():
-    numbers = [random.randint(1, 100) for _ in range(1000)]
+    numbers = [random.randint(1, 100) for _ in range(1000000)]
     return sum(numbers)
 
 def run_sequential():
