@@ -1,49 +1,26 @@
-import multiprocessing
-import threading
+# main.py
 import time
-
-# Function for multiprocessing to calculate the sum of a range of numbers
-def process_sum(start, end, result, index):
-    result[index] = sum(range(start, end))
-
-def parallel_sum_multiprocessing(n, num_processes=6):  # Changed to 6 processes
-    step = n // num_processes
-    processes = []
-    result = multiprocessing.Array('i', num_processes)  # Shared memory array for storing results
-    for i in range(num_processes):
-        start = i * step + 1
-        end = (i + 1) * step if i < num_processes - 1 else n + 1
-        process = multiprocessing.Process(target=process_sum, args=(start, end, result, i))
-        processes.append(process)
-        process.start()
-
-    for process in processes:
-        process.join()  # Ensure all processes complete
-
-    return sum(result)
-
-# Function for threading to calculate the sum of a range of numbers
-def thread_sum(start, end, result, index):
-    result[index] = sum(range(start, end))
-
-def parallel_sum_threading(n, num_threads=6):  # Changed to 6 threads
-    step = n // num_threads
-    threads = []
-    result = [0] * num_threads  # Store results from each thread
-    for i in range(num_threads):
-        start = i * step + 1
-        end = (i + 1) * step if i < num_threads - 1 else n + 1
-        thread = threading.Thread(target=thread_sum, args=(start, end, result, i))
-        threads.append(thread)
-        thread.start()
-
-    for thread in threads:
-        thread.join()  # Ensure all threads complete
-
-    return sum(result)
+from src.threading_parallel import parallel_sum_threading
+from src.multiprocessing_parallel import parallel_sum_multiprocessing
+from src.seq3 import seq3  # Import the sequential function
 
 def main():
     n = 10**6  # Large number
+    
+    # Run sequential
+    start_time = time.time()
+    total_sum_sequential = seq3(n)
+    end_time = time.time()
+    
+    execution_time_sequential = end_time - start_time
+    speedup_sequential = execution_time_sequential / execution_time_sequential  # Sequential time compared to itself
+    efficiency_sequential = speedup_sequential / 1  # Efficiency for sequential (1 process)
+    
+    print("\nSequential (seq3) Results:")
+    print(f"Sum: {total_sum_sequential}")
+    print(f"Execution Time (Sequential): {execution_time_sequential:.6f} seconds")
+    print(f"Speedup (Sequential): {speedup_sequential:.2f}")
+    print(f"Efficiency (Sequential): {efficiency_sequential:.4f}")
     
     # Run multiprocessing
     start_time = time.time()
@@ -51,7 +28,7 @@ def main():
     end_time = time.time()
     
     execution_time_multiprocessing = end_time - start_time
-    speedup_multiprocessing = 0.011043 / execution_time_multiprocessing  # Sequential time = 0.011043
+    speedup_multiprocessing = execution_time_sequential / execution_time_multiprocessing  # Sequential time vs multiprocessing time
     efficiency_multiprocessing = speedup_multiprocessing / 6  # 6 processes
     
     print("\nMultiprocessing Results:")
@@ -66,7 +43,7 @@ def main():
     end_time = time.time()
     
     execution_time_threading = end_time - start_time
-    speedup_threading = 0.011043 / execution_time_threading  # Sequential time = 0.011043
+    speedup_threading = execution_time_sequential / execution_time_threading  # Sequential time vs threading time
     efficiency_threading = speedup_threading / 6  # 6 threads
     
     print("\nThreading Results:")
