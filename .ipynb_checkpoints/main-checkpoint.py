@@ -1,4 +1,3 @@
-# main.py
 import time
 from src.threading_parallel import parallel_sum_threading
 from src.multiprocessing_parallel import parallel_sum_multiprocessing
