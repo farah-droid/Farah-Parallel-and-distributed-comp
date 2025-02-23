@@ -20,12 +20,13 @@ The system:
 
 ## File Structure
 project/ <br>
-├── sensors/ │ <br>
-├── init.py │<br>
+├── sensors/ <br>
+│ <br>
+├── init.py<br> │<br>
 ├── sensor_simulator.py # Simulates sensor readings<br>
-│ └── data_processor.py # Processes temperature data<br>
-├── display/ │ <br>
-├── init.py │<br>
+│<br> └── data_processor.py # Processes temperature data<br>
+├── display/<br> │ <br>
+├── init.py<br> │<br>
 └── display_logic.py # Handles console display<br>
 └── main.py # Main program to start the system<br>
 
