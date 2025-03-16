@@ -1,69 +1,78 @@
-# Lab 4: Real-Time Temperature Monitoring System
+# DSAI 3202 - Assignment 1 - Part 1/2: Multiprocessing and Process Synchronization
 
 ## Overview
-This project simulates a real-time temperature monitoring system using multiple sensors. It demonstrates the use of **threading**, **queues**, and **synchronization mechanisms** in Python to handle concurrent tasks and shared resources.
 
-The system:
-1. Simulates temperature readings from multiple sensors.
-2. Calculates the average temperature for each sensor.
-3. Displays the latest temperatures and averages in real-time on the console.
+This assignment focuses on utilizing Python's multiprocessing capabilities and process synchronization with semaphores. The tasks include:
+1. Performing square calculations using different multiprocessing methods.
+2. Simulating a database connection pool using semaphores to manage access to limited resources.
 
----
-
-## Features
-- **Sensor Simulation:** Each sensor generates random temperatures between 15°C and 40°C every 1 second.
-- **Data Processing:** The system calculates the average temperature for each sensor every 5 seconds.
-- **Real-Time Display:** The console displays the latest temperatures and averages, updating in place without erasing the screen.
-- **Thread Synchronization:** Uses `threading.Lock` and `queue.Queue` to safely share data between threads.
+The following sections describe the implementation and results for both parts of the assignment.
 
 ---
 
-## File Structure
-project/ <br>
-├── sensors/ │ <br>
-├── init.py │<br>
-├── sensor_simulator.py # Simulates sensor readings<br>
-│ └── data_processor.py # Processes temperature data<br>
-├── display/ │ <br>
-├── init.py │<br>
-└── display_logic.py # Handles console display<br>
-└── main.py # Main program to start the system<br>
+## Part 1: Square Program with Multiprocessing
+
+### Task Description
+In this part of the assignment, we implemented a program that calculates the square of numbers using various approaches. The main goal was to explore different ways to parallelize the square calculation process using Python’s `multiprocessing` module and compare the performance of these approaches.
+
+The following methods were implemented:
+- **Sequential for loop**: A simple loop iterates through the list and computes the square for each number, one after another.
+- **Multiprocessing (one process per number)**: Each number is processed by a separate process. This method is inefficient due to the overhead of creating individual processes for each task.
+- **Multiprocessing Pool with map()**: This method uses a pool of worker processes to calculate the squares in parallel, distributing the tasks using the `map()` method. This approach is more efficient as it reuses processes.
+- **Multiprocessing Pool with apply()**: Similar to the `map()` method but using the `apply()` method to process each number synchronously. This method processes each task one by one but in parallel using multiple processes.
+- **ProcessPoolExecutor**: A higher-level API from `concurrent.futures` to manage processes. It allows for a more Pythonic and efficient way of parallelizing tasks.
+
+### Performance Results
+
+The program was tested with two different input sizes:
+1. **10^6 numbers**: A list containing one million random integers.
+2. **10^7 numbers**: A list containing ten million random integers.
+
+The performance of each method was measured by recording the time taken to process the entire list of numbers. The sequential method was the slowest, as it processes each number one by one. The methods using multiprocessing pools (`map()` and `apply()`) significantly improved performance by parallelizing the work across multiple processes. The **ProcessPoolExecutor** provided the best performance in terms of speed for both small and large datasets, offering an efficient way to manage multiple worker processes.
+
+#### Conclusions
+
+- **Multiprocessing significantly improves performance**, especially with larger datasets. The pooling methods (`map()` and `apply()`) were more efficient than creating individual processes for each task.
+- **Asynchronous execution** using `apply_async()` provided a slight performance improvement by allowing tasks to start processing without waiting for other tasks to complete.
+- The **ProcessPoolExecutor** provided the most efficient approach, handling both synchronous and asynchronous execution efficiently.
 
 ---
 
-## How to Run the Program
-1. Clone or download the project files.
-2. Ensure you have Python installed (Python 3.6 or higher recommended).
-3. Navigate to the project directory:
-   ```bash
-   cd path/to/project
-   ```
-Run the main program:
-```bash
-python main.py
-```
-Observe the real-time temperature updates in the console.
+## Part 2: Process Synchronization with Semaphores
 
-## Synchronization Mechanisms
-### For Sensor Simulation (simulate_sensor):
-**Mechanism:** ```threading.Lock```
-**Purpose:** Ensures that only one thread can update the latest_temperatures dictionary at a time, preventing race conditions.
-### For Data Processing (process_temperatures):
-**Mechanism:** ```threading.Lock```
-**Purpose:** Ensures that only one thread can update the temperature_averages dictionary at a time, preventing race conditions.
-### For Thread Communication:
-**Mechanism:** ```queue.Queue```
-**Purpose:** Safely passes data between the sensor threads and the data processor thread.
-### For Display Updates (update_display):
-**Mechanism:** No explicit synchronization is needed because the display thread only reads from the shared dictionaries, which are already protected by locks.
-## Why No Metrics?
-Because the goals are:
-**To understand how to use threading to perform multiple tasks concurrently.**
-**To learn how to use synchronization mechanisms like locks and queues to safely share data between threads.**
-**To implement a real-time system that updates and displays data dynamically.**
-Adding complex metrics (e.g., standard deviation, variance, etc.) would distract from these primary learning objectives.
+### Task Description
+In this part, we simulated a database connection pool using semaphores to control access to a limited number of resources. The task aimed to explore how semaphores can be used to synchronize processes and ensure that no more than a fixed number of processes can access a shared resource at the same time.
 
-## Bonus Implementation
-**Latest Temperatures:** Updated every 1 second.
-**Average Temperatures:** Updated every 5 seconds.
-**Display Updates:** Refreshes in place without erasing the console.
+### Implementation
+We implemented a **`ConnectionPool`** class to simulate a pool of database connections. The class uses a **semaphore** to manage the number of concurrent connections. The `get_connection()` method acquires a connection, and the `release_connection()` method releases the connection back to the pool.
+
+A function **`access_database()`** simulates a process that acquires a connection, performs work (simulated by a sleep), and then releases the connection back to the pool.
+
+We used multiple processes to simulate concurrent database operations. The semaphore ensured that only a limited number of processes could access the pool at any given time, effectively controlling access to the shared resource.
+
+### Observations
+
+1. **What happens if more processes try to access the pool than there are available connections?**
+   - If more processes try to access the pool than there are available connections, they will be blocked by the semaphore. The semaphore ensures that the excess processes wait until a connection is released by another process, thereby controlling access and preventing more than the allowed number of processes from using the shared resource at once.
+
+2. **How does the semaphore prevent race conditions and ensure safe access to the connections?**
+   - The **semaphore** ensures that only a limited number of processes can access the pool at a time. It prevents **race conditions** by controlling access to the shared resource (database connection pool) and ensuring that processes acquire a connection only if there is one available. If all connections are in use, the semaphore blocks any additional processes from proceeding until a connection is released. This guarantees that no more than the allowed number of processes can access the pool concurrently, preventing any potential resource conflicts.
+
+### Results
+When more processes tried to access the connection pool than the available connections, the semaphore blocked the extra processes and ensured that they could only proceed once a connection was released. This behavior allowed for safe access to shared resources without overloading the connection pool.
+
+---
+
+## Conclusion
+
+### Key Observations
+
+1. **Multiprocessing**: Using multiprocessing helps achieve better performance for CPU-bound tasks by distributing the workload across multiple processes. Pools are more efficient than creating individual processes for each task.
+2. **Semaphore Synchronization**: The semaphore is an effective tool for managing access to limited resources, ensuring that no more than the allowed number of processes can access shared resources at any given time.
+
+### Recommendations
+
+- Use multiprocessing pools when you need to parallelize tasks to avoid the overhead of creating too many processes.
+- Employ semaphores when dealing with shared resources to ensure safe access in concurrent environments.
+
+---
