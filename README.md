@@ -75,4 +75,6 @@ When more processes tried to access the connection pool than the available conne
 - Use multiprocessing pools when you need to parallelize tasks to avoid the overhead of creating too many processes.
 - Employ semaphores when dealing with shared resources to ensure safe access in concurrent environments.
 
+
+lsof -i :6379
 ---
