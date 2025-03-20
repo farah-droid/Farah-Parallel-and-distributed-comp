@@ -1,8 +1,8 @@
 import numpy as np
-from concurrent.futures import ThreadPoolExecutor
 
 
-def calculate_fitness(route, distance_matrix):
+def calculate_fitness(route,
+                      distance_matrix):
     """
     calculate_fitness function: total distance traveled by the car.
 
@@ -16,21 +16,23 @@ def calculate_fitness(route, distance_matrix):
     """
     total_distance = 0
     
-    # Iterate through the route and accumulate the distance
+    # add your code here.
     for i in range(len(route) - 1):
-        node1 = route[i]
-        node2 = route[i + 1]
+        node1, node2 = route[i], route[i + 1]
         distance = distance_matrix[node1, node2]
         
-        # If distance is infeasible, return a large positive penalty
-        if distance == 100000:
-            return 1e6  # Penalty for infeasible route
-        
+        if distance == 10000:  # Infeasible route check
+            return -100000 # Adjusted from -1e6 to -500000
+
         total_distance += distance
-    return total_distance 
+    
+    return -total_distance
 
 
-def select_in_tournament(population, scores, number_tournaments=4, tournament_size=3):
+def select_in_tournament(population,
+                         scores,
+                         number_tournaments=4,
+                         tournament_size=3):
     """
     Tournament selection for genetic algorithm.
 
@@ -44,28 +46,14 @@ def select_in_tournament(population, scores, number_tournaments=4, tournament_si
         - list: A list of selected individuals for crossover.
     """
     selected = []
-
-    # Using ThreadPoolExecutor to run tournaments in parallel
-    with ThreadPoolExecutor() as executor:
-        # Submit all tournaments for parallel execution
-        futures = [executor.submit(run_tournament, population, scores, tournament_size) for _ in range(number_tournaments)]
-
-        # Collect results from the future objects
-        for future in futures:
-            selected.append(future.result())
-
+    
+    # add your code here.
+    for _ in range(number_tournaments):
+        idx=np.random.choice(len(population),tournament_size,replace=False)
+        best_idx = idx[np.argmax(scores[idx])]
+        selected.append(population[best_idx])
+    
     return selected
-
-
-def run_tournament(population, scores, tournament_size):
-    tournament_idx = np.random.choice(len(population), tournament_size, replace=False)
-    tournament_scores = scores[tournament_idx]
-        
-    # Find the best individual in the tournament
-    best_idx = tournament_idx[np.argmin(tournament_scores)]
-        
-    # Return the best individual from this tournament
-    return population[best_idx]
 
 
 def order_crossover(parent1, parent2):
@@ -92,7 +80,8 @@ def order_crossover(parent1, parent2):
     return offspring
 
 
-def mutate(route, mutation_rate=0.1):
+def mutate(route,
+           mutation_rate = 0.1):
     """
     Mutation operator: swap two nodes in the route.
 
@@ -106,7 +95,6 @@ def mutate(route, mutation_rate=0.1):
         i, j = np.random.choice(len(route), 2, replace=False)
         route[i], route[j] = route[j], route[i]
     return route
-
 
 def generate_unique_population(population_size, num_nodes):
     """
