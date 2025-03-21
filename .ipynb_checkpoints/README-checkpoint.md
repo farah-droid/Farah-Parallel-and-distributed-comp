@@ -1,79 +1,68 @@
-# DSAI 3202 - Assignment 1 - Part 1/2: Multiprocessing and Process Synchronization
+# Farah-Parallel-and-distributed-comp
 
-## Overview
+## DSAI 3202 - Assignment 1: Part 2: Navigating the City (Genetic Algorithm for Fleet Management)
 
-This assignment focuses on utilizing Python's multiprocessing capabilities and process synchronization with semaphores. The tasks include:
-1. Performing square calculations using different multiprocessing methods.
-2. Simulating a database connection pool using semaphores to manage access to limited resources.
+### Overview
+This project utilizes a **Genetic Algorithm (GA)** to optimize delivery routes for a fleet of vehicles in a city. The primary objective is to minimize the total distance traveled by all vehicles while ensuring that each delivery node is visited exactly once by any vehicle. The solution leverages **parallel computing** techniques to distribute the workload across multiple machines, improving efficiency, especially for large datasets.
 
-The following sections describe the implementation and results for both parts of the assignment.
+The project includes the implementation of a genetic algorithm with **MPI4PY** for parallelization and distributed computing. The problem was first solved sequentially and then parallelized to improve performance. The solution is extended to handle multiple vehicles, and the algorithm is tested on both small and large city maps.
 
----
+### Objectives
+- Implement a **genetic algorithm** to optimize delivery routes.
+- Minimize the total distance traveled by all vehicles in a fleet while ensuring each node is visited once.
+- Parallelize the genetic algorithm using **MPI4PY** for efficient computation across multiple machines.
+- Extend the solution to handle multiple vehicles and large-scale problems.
 
-## Part 1: Square Program with Multiprocessing
+### Key Concepts
+- **Genetic Algorithms (GAs)**: An optimization technique inspired by natural selection, where a population of solutions evolves over time using operators such as **selection**, **crossover**, and **mutation**.
+- **Parallel Computing**: Distribution of the computation tasks (fitness evaluation, selection..) across multiple machines to speed up execution.
+- **Fleet Management**: Optimizing the routes for a fleet of vehicles, ensuring each vehicle visits a subset of delivery nodes while minimizing the total distance traveled.
 
-### Task Description
-In this part of the assignment, we implemented a program that calculates the square of numbers using various approaches. The main goal was to explore different ways to parallelize the square calculation process using Python’s `multiprocessing` module and compare the performance of these approaches.
+### Steps Taken
+#### 1. Genetic Algorithm Implementation
+The genetic algorithm consists of the following components:
+- **Fitness Function**: This function calculates the total distance of a proposed route. If any route is infeasible (a node is unreachable), a large negative penalty is returned.
+- **Selection**: A **tournament selection** method was used, where individuals compete in tournaments, and the winner is selected for crossover.
+- **Crossover**: The genetic material from two parent solutions is combined to create offspring. This was implemented with a uniform crossover method.
+- **Mutation**: Random changes were introduced to the offspring’s genetic makeup to maintain diversity and prevent premature convergence.
 
-The following methods were implemented:
-- **Sequential for loop**: A simple loop iterates through the list and computes the square for each number, one after another.
-- **Multiprocessing (one process per number)**: Each number is processed by a separate process. This method is inefficient due to the overhead of creating individual processes for each task.
-- **Multiprocessing Pool with map()**: This method uses a pool of worker processes to calculate the squares in parallel, distributing the tasks using the `map()` method. This approach is more efficient as it reuses processes.
-- **Multiprocessing Pool with apply()**: Similar to the `map()` method but using the `apply()` method to process each number synchronously. This method processes each task one by one but in parallel using multiple processes.
-- **ProcessPoolExecutor**: A higher-level API from `concurrent.futures` to manage processes. It allows for a more Pythonic and efficient way of parallelizing tasks.
+#### 2. Parallelization
+The genetic algorithm was initially implemented sequentially and then parallelized using **MPI4PY**:
+- **Fitness Evaluation**: The fitness calculation for each individual in the population was parallelized, enabling simultaneous evaluation of multiple individuals across different machines.
+- **Selection**: Tournament selection was also parallelized to improve performance.
 
-### Performance Results
+The parallelized version showed a significant improvement in execution time, especially when applied to larger datasets.
 
-The program was tested with two different input sizes:
-1. **10^6 numbers**: A list containing one million random integers.
-2. **10^7 numbers**: A list containing ten million random integers.
+#### 3. Large-Scale Problem
+The problem was tested on both a **small city map** and a **large city map**. The **`city_distances_extended.csv`** file represents the extended city layout, containing 100 nodes and 4000 routes. The parallelized algorithm successfully handled the larger dataset within a feasible time frame better than the small city.
 
-The performance of each method was measured by recording the time taken to process the entire list of numbers. The sequential method was the slowest, as it processes each number one by one. The methods using multiprocessing pools (`map()` and `apply()`) significantly improved performance by parallelizing the work across multiple processes. The **ProcessPoolExecutor** provided the best performance in terms of speed for both small and large datasets, offering an efficient way to manage multiple worker processes.
+For example, in the small city, the best route had a total distance of -2115.0, while the larger city map resulted in a total distance of -2697.0 in the final generation.
 
-#### Conclusions
+### Results:
+### Execution Times
+#### Sequential Execution Time:
+- **Best Solution**: [0, np.int64(10), np.int64(7), np.int64(31), np.int64(23), np.int64(12), np.int64(9), np.int64(2), np.int64(21), np.int64(20), np.int64(29), np.int64(26), np.int64(24), np.int64(4), np.int64(3), np.int64(5), np.int64(16), np.int64(28), np.int64(18), np.int64(27), np.int64(8), np.int64(15), np.int64(19), np.int64(1), np.int64(11), np.int64(6), np.int64(22), np.int64(30), np.int64(25), np.int64(17), np.int64(13), np.int64(14)]
+- **Total Distance**: -2115.0
+- **Execution Time**: 7.9412 seconds&#8203;:contentReference[oaicite:0]{index=0}
 
-- **Multiprocessing significantly improves performance**, especially with larger datasets. The pooling methods (`map()` and `apply()`) were more efficient than creating individual processes for each task.
-- **Asynchronous execution** using `apply_async()` provided a slight performance improvement by allowing tasks to start processing without waiting for other tasks to complete.
-- The **ProcessPoolExecutor** provided the most efficient approach, handling both synchronous and asynchronous execution efficiently.
+#### Distributed/Parallelized Execution Time:
+- **Best Solution**: [np.int64(30), np.int64(22), np.int64(14), np.int64(6), np.int64(27), np.int64(25), np.int64(28), np.int64(11), np.int64(7), np.int64(8), np.int64(18), np.int64(4), np.int64(24), np.int64(1), np.int64(20), np.int64(21), np.int64(2), np.int64(16), np.int64(15), np.int64(26), np.int64(23), np.int64(12), np.int64(9), np.int64(5), np.int64(3), 0, np.int64(17), np.int64(29), np.int64(19), np.int64(10), np.int64(13), np.int64(31)]
+- **Total Distance**: 2726.0
+- **Execution Time**: 0.82 seconds&#8203;:contentReference[oaicite:1]{index=1}
 
----
+### Performance Metrics
+The execution time and fitness of the algorithm were measured:
+- **Sequential Execution**: The genetic algorithm ran for several generations to find the optimal route. For example, in Generation 0, the best fitness was -1796.0, and after several generations, the best fitness reached -2115.0.
+- **Parallel Execution**: Using MPI4PY, the performance improved with a faster execution time due to distributed fitness evaluation and selection processes. The parallelized version showed a substantial reduction in computation time when applied to the extended dataset.
 
-## Part 2: Process Synchronization with Semaphores
-
-### Task Description
-In this part, we simulated a database connection pool using semaphores to control access to a limited number of resources. The task aimed to explore how semaphores can be used to synchronize processes and ensure that no more than a fixed number of processes can access a shared resource at the same time.
-
-### Implementation
-We implemented a **`ConnectionPool`** class to simulate a pool of database connections. The class uses a **semaphore** to manage the number of concurrent connections. The `get_connection()` method acquires a connection, and the `release_connection()` method releases the connection back to the pool.
-
-A function **`access_database()`** simulates a process that acquires a connection, performs work (simulated by a sleep), and then releases the connection back to the pool.
-
-We used multiple processes to simulate concurrent database operations. The semaphore ensured that only a limited number of processes could access the pool at any given time, effectively controlling access to the shared resource.
-
-### Observations
-
-1. **What happens if more processes try to access the pool than there are available connections?**
-   - If more processes try to access the pool than there are available connections, they will be blocked by the semaphore. The semaphore ensures that the excess processes wait until a connection is released by another process, thereby controlling access and preventing more than the allowed number of processes from using the shared resource at once.
-
-2. **How does the semaphore prevent race conditions and ensure safe access to the connections?**
-   - The **semaphore** ensures that only a limited number of processes can access the pool at a time. It prevents **race conditions** by controlling access to the shared resource (database connection pool) and ensuring that processes acquire a connection only if there is one available. If all connections are in use, the semaphore blocks any additional processes from proceeding until a connection is released. This guarantees that no more than the allowed number of processes can access the pool concurrently, preventing any potential resource conflicts.
-
-### Results
-When more processes tried to access the connection pool than the available connections, the semaphore blocked the extra processes and ensured that they could only proceed once a connection was released. This behavior allowed for safe access to shared resources without overloading the connection pool.
-
----
-
-## Conclusion
-
-### Key Observations
-
-1. **Multiprocessing**: Using multiprocessing helps achieve better performance for CPU-bound tasks by distributing the workload across multiple processes. Pools are more efficient than creating individual processes for each task.
-2. **Semaphore Synchronization**: The semaphore is an effective tool for managing access to limited resources, ensuring that no more than the allowed number of processes can access shared resources at any given time.
-
-### Recommendations
-
-- Use multiprocessing pools when you need to parallelize tasks to avoid the overhead of creating too many processes.
-- Employ semaphores when dealing with shared resources to ensure safe access in concurrent environments.
+### How to Add More Cars
+1. **Divide the City into Regions**: Split the city into regions, assigning each vehicle to a region. Each vehicle will optimize its route within its assigned region.
+2. **Vehicle Assignment**: Each vehicle will start and end its route at the depot. Assign nodes to vehicles either based on proximity or evenly divided across vehicles.
+3. **Independent Optimization**: Optimize each vehicle's route independently. The fitness function will evaluate each vehicle's route within its region, using crossover and mutation on individual vehicle populations.
+4. **Minimizing Total Distance**: After optimizing each vehicle’s route, minimize the total distance by adjusting routes across vehicles to ensure the combined distance is as low as possible.
+5. 
+### Conclusion
+This project successfully implemented and parallelized a genetic algorithm to solve the fleet management problem, optimizing delivery routes in a city. The algorithm was extended to handle larger problems and multiple vehicles, with performance improvements achieved through parallelization. This solution demonstrates the power of genetic algorithms and parallel computing for solving optimization problems efficiently.
 
 
----
+

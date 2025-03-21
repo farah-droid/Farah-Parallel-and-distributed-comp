@@ -1,40 +1,32 @@
 import numpy as np
 
-def calculate_fitness(route,
-                      distance_matrix):
+def calculate_fitness(route, distance_matrix):
     """
-    calculate_fitness function: total distance traveled by the car.
+    Calculate the total distance traveled by the car.
 
     Parameters:
         - route (list): A list representing the order of nodes visited in the route.
         - distance_matrix (numpy.ndarray): A matrix of the distances between nodes.
             A 2D numpy array where the element at position [i, j] represents the distance between node i and node j.
+
     Returns:
         - float: The negative total distance traveled (negative because we want to minimize distance).
            Returns a large negative penalty if the route is infeasible.
     """
     total_distance = 0
-                        
-    # add your code here.
-    num_nodes = len(route)
-    
-    for i in range(num_nodes - 1):
-        start, end = route[i], route[i + 1]
-        distance = distance_matrix[start, end]
-        
-        # Penalize infeasible routes (where distance is set to 100000.0)
-        if distance == 100000.0:
-            return float('inf')  # Assign an extremely high penalty
-        
-        total_distance += distance
-    
-    # Include the return trip to the depot (assumed to be node 0)
-    last_leg = distance_matrix[route[-1], route[0]]
-    if last_leg == 100000.0:
-        return float('inf')
-    total_distance += last_leg
 
-    return -total_distance  # No explicit negation needed
+    for i in range(len(route) - 1):
+        node1, node2 = route[i], route[i + 1]
+        distance = distance_matrix[node1][node2]
+
+        # Adaptive penalty for infeasible routes
+        if distance == 100000:
+            total_distance += np.median(distance_matrix[distance_matrix < 100000]) * 2  # Softer penalty
+        else:
+            total_distance += distance
+
+    return -total_distance  # Return negative value for GA optimization 
+
 
 
 def select_in_tournament(population,

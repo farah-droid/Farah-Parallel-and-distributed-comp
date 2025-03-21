@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def calculate_fitness(route,
                       distance_matrix):
     """
@@ -15,18 +14,27 @@ def calculate_fitness(route,
            Returns a large negative penalty if the route is infeasible.
     """
     total_distance = 0
-    
+                        
     # add your code here.
-    for i in range(len(route) - 1):
-        node1, node2 = route[i], route[i + 1]
-        distance = distance_matrix[node1, node2]
+    num_nodes = len(route)
+    
+    for i in range(num_nodes - 1):
+        start, end = route[i], route[i + 1]
+        distance = distance_matrix[start, end]
         
-        if distance == 10000:  # Infeasible route check
-            return -100000 # Adjusted from -1e6 to -500000
-
+        # Penalize infeasible routes (where distance is set to 100000.0)
+        if distance == 100000.0:
+            return float('inf')  # Assign an extremely high penalty
+        
         total_distance += distance
     
-    return -total_distance
+    # Include the return trip to the depot (assumed to be node 0)
+    last_leg = distance_matrix[route[-1], route[0]]
+    if last_leg == 100000.0:
+        return float('inf')
+    total_distance += last_leg
+
+    return -total_distance  # No explicit negation needed
 
 
 def select_in_tournament(population,
@@ -49,9 +57,16 @@ def select_in_tournament(population,
     
     # add your code here.
     for _ in range(number_tournaments):
-        idx=np.random.choice(len(population),tournament_size,replace=False)
-        best_idx = idx[np.argmax(scores[idx])]
+        # Randomly select individuals for the tournament
+        tournament_indices = np.random.choice(len(population), tournament_size, replace=False)
+        
+        # Get the individuals and their corresponding scores
+        tournament_scores = scores[tournament_indices]
+        best_idx = tournament_indices[np.argmin(tournament_scores)]  # Min score (since we're minimizing)
+        
+        # Append the best individual from the tournament
         selected.append(population[best_idx])
+    
     
     return selected
 
@@ -116,3 +131,5 @@ def generate_unique_population(population_size, num_nodes):
         individual = [0] + list(np.random.permutation(np.arange(1, num_nodes)))
         population.add(tuple(individual))
     return [list(ind) for ind in population]
+
+
