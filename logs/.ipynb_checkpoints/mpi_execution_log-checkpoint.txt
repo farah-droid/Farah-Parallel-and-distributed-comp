@@ -1,0 +1,11 @@
+Final Results (MPI Distributed Algorithm):
+
+Best Route: [0, 14, 24, 29, 6, 25, 2, 22, 27, 31, 7, 4, 23, 28, 30, 16, 12, 5, 8, 11, 10, 19, 20, 3, 17, 21, 26, 18, 15, 9, 1, 13]
+
+Total Distance: 1180.0
+
+Number of processes used: 4
+
+Total execution time: 6.1924 seconds
+
+for distributed/parallelized

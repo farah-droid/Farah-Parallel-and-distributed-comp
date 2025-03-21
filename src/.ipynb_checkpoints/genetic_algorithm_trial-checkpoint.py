@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import time
-#from large_scale_ga
 from genetic_algorithms_functions import calculate_fitness, \
     select_in_tournament, order_crossover, mutate, \
     generate_unique_population
@@ -9,8 +8,6 @@ from genetic_algorithms_functions import calculate_fitness, \
 
 # Load the distance matrix
 distance_matrix = pd.read_csv('data/city_distances.csv').to_numpy()
-# distance_matrix = pd.read_csv("data/city_distances_extended.csv").to_numpy()
-
 
 # Parameters
 num_nodes = distance_matrix.shape[0]
@@ -29,11 +26,14 @@ population = generate_unique_population(population_size, num_nodes)
 # Initialize variables for tracking stagnation
 best_calculate_fitness = int(1e6)
 stagnation_counter = 0
+
+# Start timing
 start_time = time.time()
+
 # Main GA loop
 for generation in range(num_generations):
     # Evaluate calculate_fitness
-    calculate_fitness_values = np.array([calculate_fitness(route, distance_matrix) for route in population])
+    calculate_fitness_values = np.array([-calculate_fitness(route, distance_matrix) for route in population])
 
     # Check for stagnation
     current_best_calculate_fitness = np.min(calculate_fitness_values)
@@ -41,7 +41,6 @@ for generation in range(num_generations):
         best_calculate_fitness = current_best_calculate_fitness
         stagnation_counter = 0
     else:
-        
         stagnation_counter += 1
 
     # Regenerate population if stagnation limit is reached, keeping the best individual
@@ -78,13 +77,14 @@ for generation in range(num_generations):
     print(f"Generation {generation}: Best calculate_fitness = {current_best_calculate_fitness}")
 
 # Update calculate_fitness_values for the final population
-calculate_fitness_values = np.array([calculate_fitness(route, distance_matrix) for route in population])
+calculate_fitness_values = np.array([-calculate_fitness(route, distance_matrix) for route in population])
 
 # Output the best solution
 best_idx = np.argmin(calculate_fitness_values)
 best_solution = population[best_idx]
 print("Best Solution:", best_solution)
-print("Total Distance:", calculate_fitness(best_solution, distance_matrix))
+print("Total Distance:", -1*calculate_fitness(best_solution, distance_matrix))
+# Calculate execution time
 end_time = time.time()
 execution_time = end_time - start_time
-print(f"Execution Time: {execution_time} seconds")
+print(f"Total execution time: {execution_time:.4f} seconds")
